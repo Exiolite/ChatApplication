@@ -9,26 +9,25 @@ namespace Net
     {
         public UserModel UserModel { get; set; } = new UserModel();
 
-        private Data _data;
         private TcpClient _tcpClient;
         private PacketReader _packetReader;
+
 
         public Client()
         {
             _tcpClient = new TcpClient();
         }
 
-        public Client(TcpClient tcpClient, Listener listener, Data data)
+        public Client(TcpClient tcpClient, Data data)
         {
             _tcpClient = tcpClient;
-            UserModel.Guid = Guid.NewGuid();
 
             _packetReader = new PacketReader(_tcpClient.GetStream());
 
-            Task.Run(() => ProcessPacket(listener, data));
+            Task.Run(() => ProcessPacket(data));
         }
 
-        public void ProcessPacket(Listener listener, Data data)
+        public void ProcessPacket(Data data)
         {
             while (true)
             {
@@ -63,17 +62,14 @@ namespace Net
                     }
                     else
                     {
-                        Console.WriteLine($"{messageModel.PropMessage} {user.Username}: {messageModel.PropMessage}");
+                        Console.WriteLine($"{messageModel.PropCreationDateTime} {user.Username}: {messageModel.PropMessage}");
                     }
-                }
-                else if (opcode == OpCode.SynchronizeData)
-                {
-                    listener.BroadcastData();
                 }
                 else Console.WriteLine("opcode not exist");
 
-                File.WriteAllText("Data.txt", JsonSerializer.Serialize(data));
-
+                var jsonData = JsonSerializer.Serialize(data);
+                File.WriteAllText("Data.txt", jsonData);
+                Send(OpCode.SynchronizeData, jsonData);
             }
         }
 
