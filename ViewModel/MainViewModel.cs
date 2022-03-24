@@ -1,9 +1,5 @@
-﻿using Net;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Model;
+using Net;
 
 namespace ViewModel
 {
@@ -15,6 +11,17 @@ namespace ViewModel
 
         private Client _client;
 
+
+        #region PropMessageModelCollection
+        private Data _data = new Data();
+
+        public Data PropData
+        {
+            get { return _data; }
+            set { _data = value; NotifyPropertyChanged(nameof(PropData)); }
+        }
+
+        #endregion
 
         #region PropUsername
         private string _username = string.Empty;
@@ -33,33 +40,18 @@ namespace ViewModel
         public string PropMessage
         {
             get { return _message; }
-            set 
-            {
-                _message = value; 
-                PropIsMessageNotEmpty = _message != string.Empty;
-                NotifyPropertyChanged(nameof(PropMessage)); 
-            }
+            set { _message = value; NotifyPropertyChanged(nameof(PropMessage)); }
         }
 
         #endregion
 
-        #region PropIsMessageNotEmpty
-        private bool _isMessageNotEmpty;
-
-        public bool PropIsMessageNotEmpty
-        {
-            get { return _isMessageNotEmpty; }
-            set { _isMessageNotEmpty = value; NotifyPropertyChanged(nameof(PropIsMessageNotEmpty)); }
-        }
-
-        #endregion
 
         public MainViewModel()
         {
             _client = new Client();
 
-            CMDConnectToServer = new RelayCommand(o => _client.ConnectToServer(PropUsername), o => !string.IsNullOrEmpty(PropUsername));
-            CMDSendMessage = new RelayCommand(o => _client.SendMessage(PropMessage), o => !string.IsNullOrEmpty(PropMessage));
+            CMDConnectToServer = new RelayCommand(o => _client.Send(OpCode.ConnectToServer, PropUsername), o => !string.IsNullOrEmpty(PropUsername));
+            CMDSendMessage = new RelayCommand(o => _client.Send(OpCode.SendMessage, PropMessage), o => !string.IsNullOrEmpty(PropMessage));
         }
     }
 }

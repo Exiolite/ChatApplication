@@ -1,13 +1,15 @@
-﻿using System.Net;
+﻿using Model;
+using System.Net;
 using System.Net.Sockets;
+using System.Text.Json;
 
 namespace Net
 {
     public class Client
     {
-        public string Username { get; set; }
-        public Guid Guid { get; set; }
+        public UserModel UserModel { get; set; } = new UserModel();
 
+        private Data _data;
         private TcpClient _tcpClient;
         private PacketReader _packetReader;
 
@@ -16,39 +18,79 @@ namespace Net
             _tcpClient = new TcpClient();
         }
 
-        public Client(TcpClient tcpClient)
+        public Client(TcpClient tcpClient, Listener listener, Data data)
         {
             _tcpClient = tcpClient;
-            Guid = Guid.NewGuid();
+            UserModel.Guid = Guid.NewGuid();
 
             _packetReader = new PacketReader(_tcpClient.GetStream());
 
-            Task.Run(() => PacketProcessor.Process(_packetReader, this));
+            Task.Run(() => ProcessPacket(listener, data));
         }
 
-        public void ConnectToServer(string username)
+        public void ProcessPacket(Listener listener, Data data)
         {
-            if (!_tcpClient.Connected)
+            while (true)
             {
-                _tcpClient.Connect(IPAddress.Parse(NetSettings.ServerIp), NetSettings.ServerPort);
+                var opcode = (OpCode)Enum.Parse(typeof(OpCode), _packetReader.ReadByte().ToString());
 
-                var connectPacket = new PacketBuilder()
-                    .WriteOpCode(0)
-                    .WriteString(username)
-                    .ToBytesArray();
+                if (opcode == OpCode.ConnectToServer)
+                {
+                    UserModel = new UserModel()
+                    {
+                        Guid = Guid.NewGuid(),
+                        Username = _packetReader.ToString()
+                    };
+                    data.UserModelList.Add(UserModel);
 
-                _tcpClient.Client.Send(connectPacket);
+                    Console.WriteLine($"{UserModel.Username} has connected to server");
+                }
+                else if (opcode == OpCode.SendMessage)
+                {
+                    var messageModel = new MessageModel()
+                    {
+                        PropUserGuid = UserModel.Guid,
+                        PropCreationDateTime = DateTime.Now,
+                        PropMessage = _packetReader.ToString()
+                    };
+                    data.MessageModelList.Add(messageModel);
+
+                    var user = data.UserModelList.FirstOrDefault(o => o.Guid == messageModel.PropUserGuid);
+
+                    if (user == null)
+                    {
+                        Console.WriteLine($"User with Guid: {messageModel.PropUserGuid} not found");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"{messageModel.PropMessage} {user.Username}: {messageModel.PropMessage}");
+                    }
+                }
+                else if (opcode == OpCode.SynchronizeData)
+                {
+                    listener.BroadcastData();
+                }
+                else Console.WriteLine("opcode not exist");
+
+                File.WriteAllText("Data.txt", JsonSerializer.Serialize(data));
+
             }
         }
 
-        public void SendMessage(string str)
+        public void Send(OpCode opcode, string str)
         {
-            var messagePacket = new PacketBuilder()
-                .WriteOpCode(5)
+            if (opcode == OpCode.ConnectToServer && !_tcpClient.Connected)
+            {
+                _tcpClient.Connect(IPAddress.Parse(NetSettings.ServerIp), NetSettings.ServerPort);
+                _packetReader = new PacketReader(_tcpClient.GetStream());
+            }
+
+            var packet = new PacketBuilder()
+                .WriteOpCode((byte)opcode)
                 .WriteString(str)
                 .ToBytesArray();
 
-            _tcpClient.Client.Send(messagePacket);
+            _tcpClient.Client.Send(packet);
         }
     }
 }

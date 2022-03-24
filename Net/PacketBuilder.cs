@@ -13,9 +13,9 @@ namespace Net
         }
 
 
-        public PacketBuilder WriteOpCode(byte opCode)
+        public PacketBuilder WriteOpCode(byte opcode)
         {
-            _memoryStream.WriteByte(opCode);
+            _memoryStream.WriteByte(opcode);
             return this;
         }
 

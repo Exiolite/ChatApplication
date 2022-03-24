@@ -38,11 +38,18 @@
                 <ColumnDefinition Width="64" />
             </Grid.ColumnDefinitions>
             <!--#endregion-->
+            <ListBox Grid.Row="0"
+                     ItemsSource="{Binding PropData.MessageModelList}">
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <TextBlock Text="{Binding PropMessage}" />
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
             <TextBox Grid.Column="0"
                      Text="{Binding PropMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Grid.Column="1"
                     Content="Send"
-                    IsEnabled="{Binding PropIsMessageNotEmpty}"
                     Command="{Binding CMDSendMessage}" />
         </Grid>
     </Grid>
