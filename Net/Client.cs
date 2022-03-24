@@ -23,10 +23,7 @@ namespace Net
 
             _packetReader = new PacketReader(_tcpClient.GetStream());
 
-            var opCode = _packetReader.ReadByte();
-            Username = _packetReader.ToString();
-
-            Console.WriteLine($"{Username} connected");
+            Task.Run(() => PacketProcessor.Process(_packetReader, this));
         }
 
         public void ConnectToServer(string username)
@@ -44,9 +41,14 @@ namespace Net
             }
         }
 
-        public void SendMessage()
+        public void SendMessage(string str)
         {
+            var messagePacket = new PacketBuilder()
+                .WriteOpCode(5)
+                .WriteString(str)
+                .ToBytesArray();
 
+            _tcpClient.Client.Send(messagePacket);
         }
     }
 }

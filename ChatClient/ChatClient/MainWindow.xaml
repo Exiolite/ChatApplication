@@ -38,8 +38,11 @@
                 <ColumnDefinition Width="64" />
             </Grid.ColumnDefinitions>
             <!--#endregion-->
+            <TextBox Grid.Column="0"
+                     Text="{Binding PropMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Grid.Column="1"
                     Content="Send"
+                    IsEnabled="{Binding PropIsMessageNotEmpty}"
                     Command="{Binding CMDSendMessage}" />
         </Grid>
     </Grid>
