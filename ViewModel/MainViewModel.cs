@@ -1,27 +1,20 @@
 ﻿using Model;
-using Net;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Net.Http;
+using System.Text.Json;
 
 namespace ViewModel
 {
     public class MainViewModel : ViewModel
     {
-        public RelayCommand CMDConnectToServer { get; set; }
+        public RelayCommand CMDRefresh { get; set; }
         public RelayCommand CMDSendMessage { get; set; }
 
 
-        private Client _client;
+        public HttpClient HttpClient { get; set; }
+        public const string ServerUrl = "https://localhost:44396/api/";
 
-
-        #region PropMessageModelCollection
-        private Data _data = new Data();
-
-        public Data PropData
-        {
-            get { return _data; }
-            set { _data = value; NotifyPropertyChanged(nameof(PropData)); }
-        }
-
-        #endregion
 
         #region PropUsername
         private string _username = string.Empty;
@@ -31,6 +24,17 @@ namespace ViewModel
             get { return _username; }
             set { _username = value; NotifyPropertyChanged(nameof(PropUsername)); }
         }
+        #endregion
+
+        #region PropMessageCollection
+        private ObservableCollection<Message> _messageList = new ObservableCollection<Message>();
+
+        public ObservableCollection<Message> PropMessageList
+        {
+            get { return _messageList; }
+            set { _messageList = value; NotifyPropertyChanged(nameof(PropMessageList)); }
+        }
+
 
         #endregion
 
@@ -48,10 +52,34 @@ namespace ViewModel
 
         public MainViewModel()
         {
-            _client = new Client();
+            HttpClient = new HttpClient();
 
-            CMDConnectToServer = new RelayCommand(o => _client.Send(OpCode.ConnectToServer, PropUsername), o => !string.IsNullOrEmpty(PropUsername));
-            CMDSendMessage = new RelayCommand(o => _client.Send(OpCode.SendMessage, PropMessage), o => !string.IsNullOrEmpty(PropMessage));
+            CMDRefresh = new RelayCommand(o => SetPropMessageCollection());
+            //CMDSendMessage = new RelayCommand(o => _client.Send(OpCode.SendMessage, PropMessage), o => !string.IsNullOrEmpty(PropMessage));
+        }
+
+        private async void SetPropMessageCollection()
+        {
+            var jsonMessageList = await HttpClient.GetStringAsync($"{ServerUrl}message");
+            var receivedMessageList = JsonSerializer.Deserialize<List<Message>>(jsonMessageList);
+            PropMessageList.Clear();
+            foreach (var message in receivedMessageList)
+            {
+                PropMessageList.Add(message);
+            }
+        }
+
+        private async void SendMessage()
+        {
+            var message = new Message()
+            {
+                PropUsername = PropUsername,
+                PropMessage = PropMessage,
+                PropCreationDateTime = System.DateTime.Now
+            };
+            var jsonMessage = JsonSerializer.Serialize<Message>(message);
+
+            //HttpClient.PostAsync($"message/{jsonMessage}");
         }
     }
 }

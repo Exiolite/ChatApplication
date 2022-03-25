@@ -27,19 +27,24 @@
                     Grid.Column="0"
                     Grid.RowSpan="2">
             <TextBox Text="{Binding PropUsername, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged }" />
-            <Button Content="Connect"
-                    Command="{Binding CMDConnectToServer}" />
+            <Button Content="Refresh"
+                    Command="{Binding CMDRefresh}" />
         </StackPanel>
-        <Grid Grid.Row="1"
-              Grid.Column="1">
+        <Grid Grid.Column="1"
+              Grid.RowSpan="2">
             <!--#region <Grid.Definitions> -->
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="64" />
+            </Grid.RowDefinitions>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="64" />
             </Grid.ColumnDefinitions>
             <!--#endregion-->
             <ListBox Grid.Row="0"
-                     ItemsSource="{Binding PropData.MessageModelList}">
+                     Grid.ColumnSpan="2"
+                     ItemsSource="{Binding PropMessageList}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <TextBlock Text="{Binding PropMessage}" />
@@ -47,8 +52,10 @@
                 </ListBox.ItemTemplate>
             </ListBox>
             <TextBox Grid.Column="0"
+                     Grid.Row="1"
                      Text="{Binding PropMessage, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
             <Button Grid.Column="1"
+                    Grid.Row="1"
                     Content="Send"
                     Command="{Binding CMDSendMessage}" />
         </Grid>
