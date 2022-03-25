@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net.Http;
+using System.Net.Http.Json;
 using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace ViewModel
 {
@@ -55,7 +57,7 @@ namespace ViewModel
             HttpClient = new HttpClient();
 
             CMDRefresh = new RelayCommand(o => SetPropMessageCollection());
-            //CMDSendMessage = new RelayCommand(o => _client.Send(OpCode.SendMessage, PropMessage), o => !string.IsNullOrEmpty(PropMessage));
+            CMDSendMessage = new RelayCommand(o => SendMessage(), o => !string.IsNullOrEmpty(PropMessage));
         }
 
         private async void SetPropMessageCollection()
@@ -77,9 +79,11 @@ namespace ViewModel
                 PropMessage = PropMessage,
                 PropCreationDateTime = System.DateTime.Now
             };
-            var jsonMessage = JsonSerializer.Serialize<Message>(message);
+            var jsonMessage = JsonSerializer.Serialize(message);
 
-            //HttpClient.PostAsync($"message/{jsonMessage}");
+            HttpContent content = new StringContent(jsonMessage);
+            await HttpClient.PostAsJsonAsync($"{ServerUrl}message", jsonMessage);
+            SetPropMessageCollection();
         }
     }
 }

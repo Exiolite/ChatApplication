@@ -15,16 +15,6 @@ namespace ChatWebServer.Controllers
         private const string MessageListFileName = "MessageList.json";
         public List<Message> MessageList { get; set; } = new List<Message>();
 
-        public MessageController()
-        {
-            MessageList.Add(new Message()
-            {
-                PropUsername = "Exiolite",
-                PropMessage = "Init",
-                PropCreationDateTime = DateTime.Now
-            });
-        }
-
         // GET: api/Message
         public List<Message> Get()
         {
@@ -39,7 +29,7 @@ namespace ChatWebServer.Controllers
         }
 
         // POST: api/Message
-        public void Post([FromBody] string value)
+        public void Post([FromBody]string value)
         {
             var message = JsonSerializer.Deserialize<Message>(value);
 
@@ -68,7 +58,7 @@ namespace ChatWebServer.Controllers
 
         private void Load()
         {
-            if (!File.Exists(MessageListFileName))
+            if (!File.Exists(GetPath()))
             {
                 Save(); 
             }
