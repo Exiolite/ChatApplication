@@ -60,6 +60,13 @@ namespace ChatWebServer.Controllers
         {
             if (!File.Exists(GetPath()))
             {
+                var initialMessage = new Message()
+                {
+                    PropCreationDateTime = DateTime.Now,
+                    PropUsername = "Server",
+                    PropMessage = "Initial Message"
+                };
+                MessageList.Add(initialMessage);
                 Save(); 
             }
 
