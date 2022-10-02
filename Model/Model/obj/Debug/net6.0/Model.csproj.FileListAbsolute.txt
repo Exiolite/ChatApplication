@@ -1,0 +1,12 @@
+C:\Git\ChatApplication\Model\Model\bin\Debug\net6.0\Model.deps.json
+C:\Git\ChatApplication\Model\Model\bin\Debug\net6.0\Model.dll
+C:\Git\ChatApplication\Model\Model\bin\Debug\net6.0\Model.pdb
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\Model.csproj.AssemblyReference.cache
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\Model.GeneratedMSBuildEditorConfig.editorconfig
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\Model.AssemblyInfoInputs.cache
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\Model.AssemblyInfo.cs
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\Model.csproj.CoreCompileInputs.cache
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\Model.dll
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\refint\Model.dll
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\Model.pdb
+C:\Git\ChatApplication\Model\Model\obj\Debug\net6.0\ref\Model.dll
